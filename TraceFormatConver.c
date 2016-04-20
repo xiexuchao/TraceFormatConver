@@ -1,8 +1,9 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define __MSR_TRACE__
+#define __TRACE_MSR__
+#define __TRACE_SPC__
+#define __TRACE_NETAPP__
 
 #define BUFSIZE 300
 #define READ	0
@@ -12,9 +13,13 @@ void msr2ascii(char *source,char *target);
 
 void main()
 {
-	char in[20]="hm_1.csv";
-	char out[20]="12.ascii";
-	msr2ascii(in,out);
+	char path_i[100]="F:\\MSR Trace\\";
+	char path_o[100]="results\\";
+	char path_source[100];
+	char path_target[100];
+
+	msr2ascii(strcat(strcpy(path_source,path_i),"hm_1.csv"),
+			  strcat(strcpy(path_target,path_o),"hm_1.ascii"));
 }
 
 void msr2ascii(char *source,char *target)
@@ -35,8 +40,8 @@ void msr2ascii(char *source,char *target)
 	char hostName[10];		
 	unsigned int diskNumber;
 	char operation[10];		//"Read" or "Write"
-	unsigned int offset;	//bytes
-	unsigned int length;		//bytes
+	long long offset;	//bytes
+	unsigned int length;	//bytes
 	long long responseTime;	//windows filetime
 
 	//for preprocess
@@ -53,7 +58,7 @@ void msr2ascii(char *source,char *target)
 				buf[i]=' ';
 			}
 		}
-		sscanf(buf,"%lld %s %d %s %d %d %lld",&timeStamp,hostName,
+		sscanf(buf,"%lld %s %d %s %lld %d %lld",&timeStamp,hostName,
 			&diskNumber,operation,&offset,&length,&responseTime);
 		
 		//Preprocess 
@@ -72,7 +77,7 @@ void msr2ascii(char *source,char *target)
 		timeStamp=timeStamp-initTime;
 		
 		//Format Covert
-		time=(double)((long double)timeStamp/10000);
+		time=(double)((long double)timeStamp/10000); //10ns-->ms
 		dev=diskNumber;
 		lba=offset/512;
 		size=length/512;
@@ -83,7 +88,7 @@ void msr2ascii(char *source,char *target)
 		{
 			type=WRITE;
 		}
-		fprintf(file_target,"%-15lf %d %-8lld %-5d %d\n",time,dev,lba,size,type);
+		fprintf(file_target,"%-15lf %d %-8lld %-4d %d\n",time,dev,lba,size,type);
 		fflush(file_target);
 	}//while
 	fclose(file_source);
