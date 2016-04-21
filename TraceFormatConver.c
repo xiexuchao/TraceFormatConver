@@ -26,11 +26,9 @@ void main()
 	char path_target[100];
 
 #ifdef __TRACE_MSR__
-	msr2ascii(strcat(strcpy(path_source,path_i),"prxy_1.csv"),
-			  strcat(strcpy(path_target,path_o),"prxy_1.ascii"));
+	msr2ascii(strcat(strcpy(path_source,path_i),"prxy_1.csv"),strcat(strcpy(path_target,path_o),"prxy_1.ascii"));
 #else
-	netapp2ascii(strcat(strcpy(path_source,path_i),"UMNtrace2_5.csv"),
-			  strcat(strcpy(path_target,path_o),"UMNtrace2_5.ascii"));
+	netapp2ascii(strcat(strcpy(path_source,path_i),"UMNtrace2_5.csv"),strcat(strcpy(path_target,path_o),"UMNtrace2_5.ascii"));
 #endif
 
 }
@@ -146,7 +144,7 @@ void netapp2ascii(char *source,char *target)
 				buf[i]=' ';
 			}
 		}
-		sscanf(buf,"%lf %s %d %d %d %lld %d %d",&elapsedTime,cmd,
+		sscanf(buf,"%Lf %s %d %d %d %lld %d %d",&elapsedTime,cmd,
 			&lunssid,&op,&phase,&offset,&nblks,&hostid);
 		
 		//Preprocess 
