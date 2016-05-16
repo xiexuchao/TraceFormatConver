@@ -9,8 +9,8 @@
 #define READ	0
 #define WRITE	1
 
-#define SLOT_BEG 55 //MIN
-#define SLOT_END 65
+#define SLOT_TIME 240	//MIN
+#define SLOT_SIZE 1150	//GB 20+200+930
 
 void msr2ascii(char *source,char *target);
 void netapp2ascii(char *source,char *target);
@@ -19,10 +19,10 @@ void main()
 {
 #ifdef __TRACE_MSR__
 	char path_i[100]="F:\\MSR Trace\\";
-	char path_o[100]="F:\\MSR Trace\\";
+	char path_o[100]="F:\\MSR Trace\\1150GB_4HOUR\\";
 #else
 	char path_i[100]="F:\\Netapp Trace\\";
-	char path_o[100]="F:\\Netapp Trace\\";
+	char path_o[100]="F:\\Netapp Trace\\1150GB_4HOUR\\";
 #endif
 	char path_source[100];
 	char path_target[100];
@@ -140,6 +140,16 @@ void msr2ascii(char *source,char *target)
 		{
 			type=WRITE;
 		}
+		/*************************/
+		if(lba > (long long)SLOT_SIZE*1024*1024*2)//20GB + 200GB + 1000GB
+		{
+			continue;
+		}
+		if(time > SLOT_TIME*60*1000)	
+		{
+			break;
+		}
+		/*************************/
 		fprintf(file_target,"%-15lf %d %-8lld %-4d %d\n",time,dev,lba,size,type);
 		fflush(file_target);
 	}//while
@@ -205,6 +215,17 @@ void netapp2ascii(char *source,char *target)
 		lba=offset;
 		size=nblks;
 		type=op;
+
+		/*************************/
+		if(lba > (long long)SLOT_SIZE*1024*1024*2)//20GB + 200GB + 1000GB
+		{
+			continue;
+		}
+		if(time > SLOT_TIME*60*1000)	
+		{
+			break;
+		}
+		/*************************/
 
 		fprintf(file_target,"%-15lf %d %-12lld %-4d %d\n",time,dev,lba,size,type);
 		fflush(file_target);
